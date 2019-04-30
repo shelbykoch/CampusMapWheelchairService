@@ -86,7 +86,9 @@ function selectBuilding() {
          validDestination = true;                
     }
     <% } %>
-    if(validStart && validDestination) {
+    //Only proceed with route generation if a start and destination building have been set
+    ///Start and destination buildings cannot be the same
+    if(validStart && validDestination && (startBldg != destinationBldg)) {
         selectDoors();
     } else {
         alert("Please select a valid starting point and destination")
