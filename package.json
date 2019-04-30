@@ -1,0 +1,28 @@
+{
+    "name": "campusmapwheelchairusers",
+    "version": "1.0.0",
+    "description": "Software Engineering I - Term Project",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/morningstarc/CampusMapWheelchairUsers.git"
+    },
+    "author": "MorningStar Cornell, Shelby Koch, Trevor Regier",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/morningstarc/CampusMapWheelchairUsers/issues"
+    },
+    "homepage": "https://github.com/morningstarc/CampusMapWheelchairUsers#readme",
+    "dependencies": {
+        "@google/maps": "^0.5.5",
+        "ejs": "^2.6.1",
+        "express": "^4.16.4",
+        "express-session": "^1.15.6",
+        "mongo": "^0.1.0",
+        "nodemon": "^1.18.11"
+    }
+}

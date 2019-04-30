@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <% include ./partials/header.ejs %>
+    <% include ./partials/nav.ejs %>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <title>Campus Navigation</title>
+</head>
+
+<body style="background-color:#002D62">
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">Current Location</span>
+            <input list="selectBuilding" name="selectBuilding" id="startingBuilding">
+                <datalist id="selectBuilding">
+                    <% for (const building of buildings) {%>
+                        <option value="<%=building.name%>">
+                    <%}%>
+                </datalist>
+            </div>                   
+        </div>
+    </div>
+    
+    <div class="col-m-3">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">Destination</span>
+            <input list="selectBuilding" name="selectBuilding" id="destinationBuilding">
+        </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-warning" onClick="selectBuilding()">Get Directions</button>
+    </div>
+  </div>
+</div>
+    <div id="map"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdXD8oxcCd95leHi7DxNkbTkI9XNWbLao&callback=initMap"></script>
+    <script>
+    var map;
+        function initMap() {
+            directionsService = new google.maps.DirectionsService();
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            var uco = new google.maps.LatLng(35.658010, -97.471544);
+            var mapOptions = {
+                zoom: 16,
+                center: uco
+            }
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            directionsDisplay.setMap(map);
+        };
+
+/*------------------------------ END INIT MAP------------------------------*/
+//Seleted building objects
+var startBldg;
+var destinationBldg;
+//Selected doors, lat, long stored as single string
+var startDoor;
+var destinationDoor;
+//Start point and destination stored as floats 
+var startLat;
+var startLong;
+var destinationLat;
+var destinationLong; 
+
+//Takes input from data lists and sets the start and destination buildings based on name
+function selectBuilding() {
+    //var popup = document.getElementById("myPopup");
+    var validStart = false;
+    var validDestination = false;
+    <% for (const building of buildings) { %>
+    if ("<%=building.name%>" == document.getElementById('startingBuilding').value) {
+         startBldg =  <%-JSON.stringify(building)%>;
+         validStart = true;
+    } else if ("<%=building.name %>" == document.getElementById('destinationBuilding').value) {
+         destinationBldg = <%-JSON.stringify(building)%>;
+         validDestination = true;                
+    }
+    <% } %>
+    if(validStart && validDestination) {
+        selectDoors();
+    } else {
+        alert("Please select a valid starting point and destination")
+    }
+}
+
+//After the two building objects have been selected, doors are compard to find the two closest together
+function selectDoors() {
+    let distance = 10000000;
+    for (let i = 0; i < startBldg.doors.length; i++) {
+        for (let j = 0; j <
+            destinationBldg.doors.length; j++) {
+            let newDistance = getDistance(startBldg.doors[i], destinationBldg.doors[j]);
+            if (newDistance < distance) {
+                startDoor = startBldg.doors[i];
+                destinationDoor = destinationBldg.doors[j];
+                distance = newDistance;
+            }
+        }
+    }
+    setLatLng();
+}
+
+//Takes string lat lng and converts it to number for use by the google maps object
+function setLatLng() {
+    var start = startDoor.split(',');
+    var end = destinationDoor.split(',');
+    startLat = parseFloat(start[0]);
+    startLong = parseFloat(start[1]);
+    destinationLat = parseFloat(end[0]);
+    destinationLong = parseFloat(end[1]);
+    calcRoute();
+}
+
+//Requests route from Google Maps Directions Services
+function calcRoute() {
+  var start = new google.maps.LatLng(startLat, startLong);
+  var end = new google.maps.LatLng(destinationLat, destinationLong);
+  var request = {
+    origin: start,
+    destination: end,
+    travelMode: 'WALKING'
+  };
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      directionsDisplay.setDirections(result);
+    }
+  });
+}
+
+//Takes string "lat,long", splits it, and converts to floats
+function getDistance(b1, b2) {
+    //split array
+    var building1 = b1.split(',');
+    var building2 = b2.split(','); 
+    //cast strings to double and put in object
+    var p1 = {
+        lat: parseFloat(building1[0]),
+        lng: parseFloat(building1[1])
+    };
+    var p2 = {
+        lat: parseFloat(building2[0]),
+        lng: parseFloat(building2[1])
+    };
+    var R = 6378137; // Earth’s mean radius in meter
+    var dLat = rad(p2.lat - p1.lat);
+    var dLong = rad(p2.lng - p1.lng);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(p1.lat)) * Math.cos(rad(p2.lat)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d; // returns the distance in meter
+};
+
+function rad(degrees) {
+    var pi = Math.PI;
+    return degrees * (pi / 180);
+}
+</script>
+</body>
+
+</html>
