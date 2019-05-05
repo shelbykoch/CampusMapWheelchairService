@@ -38,12 +38,19 @@
         </div>
         </div>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-3">
       <button type="button" class="btn btn-warning" onClick="selectBuilding()">Get Directions</button>
     </div>
   </div>
+ 
 </div>
     <div id="map"></div>
+    <div class="map-cnt">
+        <div id="map" style="height:100%"></div>  
+        <div class="alert alert-primary map-alert">
+     <strong>All routes and doors are wheelchair accessible!</strong>
+    </div>  
+</div> 
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdXD8oxcCd95leHi7DxNkbTkI9XNWbLao&callback=initMap"></script>
     <script>
     var map;
@@ -74,16 +81,15 @@ var destinationLong;
 
 //Takes input from data lists and sets the start and destination buildings based on name
 function selectBuilding() {
-    //var popup = document.getElementById("myPopup");
     var validStart = false;
     var validDestination = false;
     <% for (const building of buildings) { %>
     if ("<%=building.name%>" == document.getElementById('startingBuilding').value) {
-         startBldg =  <%-JSON.stringify(building)%>;
-         validStart = true;
+         startBldg =  <%-JSON.stringify(building)%>; //Store selected building object
+         validStart = true; //Start building is valid
     } else if ("<%=building.name %>" == document.getElementById('destinationBuilding').value) {
-         destinationBldg = <%-JSON.stringify(building)%>;
-         validDestination = true;                
+         destinationBldg = <%-JSON.stringify(building)%>; //Stored selected building object
+         validDestination = true; //Destination building is valid
     }
     <% } %>
     //Only proceed with route generation if a start and destination building have been set
@@ -95,7 +101,7 @@ function selectBuilding() {
     }
 }
 
-//After the two building objects have been selected, doors are compard to find the two closest together
+//After the two building objects have been selected, doors are compard to find the two nearest doors
 function selectDoors() {
     let distance = 10000000;
     for (let i = 0; i < startBldg.doors.length; i++) {

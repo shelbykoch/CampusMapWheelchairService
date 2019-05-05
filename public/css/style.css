@@ -12,3 +12,13 @@ body,
 #map {
     position: relative;
 }
+
+.map-cnt {
+    height: 200px;
+}
+
+.map-alert {
+    position: absolute;
+    left: 1%;
+    top: 92%;
+}
